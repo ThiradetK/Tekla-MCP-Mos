@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>TeklaMcp</AssemblyName>
+    <RootNamespace>TeklaMcp</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <Version>0.1.0</Version>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="TeklaMcp.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <!-- Same version as the copy shipped in the Tekla 2026 bin folder (13.0.4 / assembly 13.0.0.0). -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <!-- XLSX export (PLAN §2). Used only in the server process, never in the Tekla worker. -->
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
+    <!-- Tekla Open API: compile-time only. Runtime DLLs come from the local Tekla install (Tekla/AssemblyResolver.cs). -->
+    <PackageReference Include="Tekla.Structures" Version="2026.0.3" ExcludeAssets="runtime" />
+    <PackageReference Include="Tekla.Structures.Model" Version="2026.0.3" ExcludeAssets="runtime" />
+    <PackageReference Include="Tekla.Structures.Catalogs" Version="2026.0.3" ExcludeAssets="runtime" />
+    <PackageReference Include="Tekla.Structures.Datatype" Version="2026.0.3" ExcludeAssets="runtime" />
+  </ItemGroup>
+</Project>
