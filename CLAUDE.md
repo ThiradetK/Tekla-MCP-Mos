@@ -20,8 +20,9 @@ MCP server (`TeklaMcp.exe`) that connects Claude Desktop and Claude Code to Tekl
 - Phase 2 built (2026-11-25): 12 read-only query/data tools; `tests\integration\phase2.ps1` passes; quantities match Tekla Material List. Approved.
 - Phase 3 built (2026-11-26): 15 two-step write tools (28 tools total); `tests\integration\phase3.ps1 -Apply` passes on SSMC_Tekla (creates MCP_TEST* at x ≥ 100 m, deletes them). Approved 2026-11-26.
 - Phase 7a built (2026-11-26): `--register|--unregister desktop|code|all`, `--readonly on|off`, `--doctor`; `installer\TeklaMcp.iss` → `build.ps1 -Installer` → `dist\TeklaMcp-Setup-<ver>.exe`. Silent install/uninstall tested (Desktop + Code entries added/removed, other servers kept). User tested the wizard install: passed (2026-11-26).
-- Phase 8 built (2026-11-26): `docs\README.th.md`, `docs\TOOLS.md` (generated from tools/list), `docs\SAFETY.md`, `tests\CHECKLIST.md`; automated checklist A1–A5, A7 pass. Approved 2026-11-26; pushed to GitHub. Round 1 complete. Phase 4–7b need user approval.
-- Scope of first round: Phase 0–3 + installer (7a). Do not start Phase 4–7b without user approval.
+- Phase 8 built (2026-11-26): `docs\README.th.md`, `docs\TOOLS.md` (generated from tools/list), `docs\SAFETY.md`, `tests\CHECKLIST.md`; automated checklist A1–A5, A7 pass. Approved 2026-11-26; pushed to GitHub. Round 1 complete.
+- Round 2 approved 2026-11-26: Phase 4 → 5 → 6 → 7b, each ends with report + approval. Decisions D8–D12 in `PLAN.md` §8. Phase 4 in progress.
+- Scope of first round: Phase 0–3 + installer (7a) + docs (8). Round 2: Phase 4–7b.
 - Build: `powershell -ExecutionPolicy Bypass -File build.ps1 [-Smoke] [-Installer]` (restore → build → unit tests → optional stdio smoke test → optional installer).
 
 ## Decisions

@@ -25,6 +25,12 @@ internal static class Program
         AppDomain.CurrentDomain.AssemblyResolve += Resolve;
         if (args.Length >= 2 && args[0] == "options") return Options(args);
         if (args.Length >= 2 && args[0] == "profile") return ProfileProbe(args);
+        if (args.Length == 2 && args[0] == "probe4")
+        {
+            var realOut = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(Console.Error);
+            try { return Probe4.Run(realOut, int.Parse(args[1])); } catch (Exception ex) { realOut.WriteLine("Error: " + ex); return 1; }
+        }
         if (args.Length == 1 && args[0] == "probe3")
         {
             var realOut = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };

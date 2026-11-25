@@ -1,6 +1,6 @@
 # Tekla Structures MCP Server — โครงสร้างและแผนงาน (v0.3)
 
-สถานะ: **รอบแรกเสร็จ (Phase 0–3, 7a, 8)** (2026-11-26); Phase 4–7b รออนุมัติ
+สถานะ: **รอบแรกเสร็จ (Phase 0–3, 7a, 8)**; รอบสอง Phase 4–7b อนุมัติแล้ว กำลังทำ Phase 4 (2026-11-26)
 เป้าหมาย: Tekla Structures 2026 (Open API NuGet 2026.0.3, .NET Framework 4.8)
 Environment: SE_Asia
 Client: Claude Desktop + Claude Code (server ตัวเดียวกัน)
@@ -210,6 +210,11 @@ Flow 2 ขั้น:
 | D5 | โมเดลทดสอบ | `C:\TeklaStructuresModels\SSMC_Tekla` |
 | D6 | Environment | อนุมัติ: SE_Asia |
 | D7 | ภาษาข้อความใน tool | อนุมัติ: อังกฤษ |
+| D8 | รอบสอง (2026-11-26) | อนุมัติ Phase 4–7b; แต่ละ phase ยังต้องรายงาน + รออนุมัติ |
+| D9 | DWG/DXF export | ไม่มี API → ใช้ macro ผ่าน `Operation.RunMacro` (ต้อง spike ยืนยัน) |
+| D10 | Numbering | ไม่มี API สั่ง numbering → เพิ่ม `tekla_run_numbering` (WRITE, ผ่าน macro) |
+| D11 | Validation | `tekla_validate_model` ตรวจเฉพาะ numbering / assembly; ตัด `tekla_check_geometry` ออก |
+| D12 | โมเดลทดสอบ Phase 4–6 | ใช้ SSMC_Tekla ตามเดิม (drawing/numbering ที่ทดสอบสร้างจะอยู่ในโมเดล ถ้าไม่ลบ) |
 
 ## 9. ความเสี่ยง
 
