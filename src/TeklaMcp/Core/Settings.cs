@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 namespace TeklaMcp.Core
 {
     /// <summary>
-    /// User settings from %LOCALAPPDATA%\TeklaMcp\settings.json. Missing file = defaults. The file is never created here.
+    /// User settings from %LOCALAPPDATA%\TeklaMcp\settings.json. Missing file = defaults. Only "--readonly on|off" (Registrar) writes it.
     /// </summary>
     internal sealed class Settings
     {

@@ -1,6 +1,6 @@
 # Tekla Structures MCP Server — โครงสร้างและแผนงาน (v0.3)
 
-สถานะ: **Phase 0–3 เสร็จ, กำลังทำ Phase 7a (installer)** (2026-11-26)
+สถานะ: **Phase 0–3 เสร็จ, Phase 7a (installer) สร้างเสร็จ รออนุมัติก่อน Phase 8** (2026-11-26)
 เป้าหมาย: Tekla Structures 2026 (Open API NuGet 2026.0.3, .NET Framework 4.8)
 Environment: SE_Asia
 Client: Claude Desktop + Claude Code (server ตัวเดียวกัน)
@@ -153,6 +153,7 @@ Flow 2 ขั้น:
     - path ที่ Desktop (MS Store) อ่านจริง: `%LOCALAPPDATA%\Claude-Data\claude_pzs8sxrjxfjjc\claude_desktop_config.json` (ยืนยันแล้ว 2026-11-25); ไฟล์ใน `%APPDATA%\Claude\` และ `Packages\...\LocalCache\Roaming\Claude\` Desktop ไม่อ่าน
     - ชื่อ package (`claude_pzs8sxrjxfjjc`) อาจต่างกันในแต่ละเครื่อง → registrar ต้องค้นหาโฟลเดอร์ `Claude-Data\claude_*` ไม่ hard-code
   - ☐ ลงทะเบียนกับ Claude Code → ถ้าพบคำสั่ง `claude`: `claude mcp add --scope user tekla -- "<path>\TeklaMcp.exe"`
+  - Uninstall เอา entry Desktop ออกเฉพาะเมื่อชี้ไปที่ exe ตัวนี้ (หรือไฟล์ที่ไม่มีแล้ว) เพื่อไม่ลบ entry ของ copy อื่น เช่น dev build
   - ☐ โหมดอ่านอย่างเดียว
 - Uninstall: เอา entry ออกจาก config (เก็บ backup ไว้)
 - `TeklaMcp.exe --doctor` ตรวจปัญหา: หา Tekla, โหลด API, เชื่อมต่อ, path config
@@ -166,7 +167,7 @@ Flow 2 ขั้น:
 | 1 | แกนหลัก | MCP handshake ผ่านใน Claude Desktop และ Claude Code; `tekla_status` เชื่อมต่อ Tekla จริงได้; log + safety gate + audit | ✅ เสร็จ |
 | 2 | Query + Data | find/get/selection/quantity/export CSV-XLSX-JSON; ตัวเลขตรงกับ report ของ Tekla | ✅ เสร็จ |
 | 3 | Create/Modify | สร้าง/แก้/ลบ ทุกชนิดในข้อ 4 ผ่าน preview→apply; อ่านค่ากลับตรง | ✅ เสร็จ (2026-11-26) |
-| 7a | Installer | `.exe` ติดตั้งได้; register/unregister Claude Desktop + Code ทำงาน | ✅ |
+| 7a | Installer | `.exe` ติดตั้งได้; register/unregister Claude Desktop + Code ทำงาน | ✅ สร้างเสร็จ รออนุมัติ (2026-11-26) |
 | 4 | Validation | validate + clash + geometry check | — |
 | 5 | Drawing | GA/A/W, update, issue, annotation | — |
 | 6 | Export | IFC, PDF, DWG/DXF, NC | — |

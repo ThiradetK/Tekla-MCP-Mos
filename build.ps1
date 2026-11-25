@@ -1,9 +1,11 @@
-# Build pipeline: restore -> build -> unit tests. Installer packing is added in Phase 7a.
-# Usage: powershell -ExecutionPolicy Bypass -File build.ps1 [-Configuration Release] [-Smoke]
-#   -Smoke  also runs tests\integration\smoke.ps1 (needs Tekla Structures running; read-only).
+# Build pipeline: restore -> build -> unit tests -> optional smoke test -> optional installer.
+# Usage: powershell -ExecutionPolicy Bypass -File build.ps1 [-Configuration Release] [-Smoke] [-Installer]
+#   -Smoke      also runs tests\integration\smoke.ps1 (needs Tekla Structures running; read-only).
+#   -Installer  also builds dist\TeklaMcp-Setup-<version>.exe with Inno Setup 6 (Release only).
 param(
     [string]$Configuration = 'Release',
-    [switch]$Smoke
+    [switch]$Smoke,
+    [switch]$Installer
 )
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
@@ -24,5 +26,14 @@ if ($forbidden) { throw "Trimble/Tekla DLLs must not be in the output: $($forbid
 if ($Smoke) {
     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'tests\integration\smoke.ps1') -Exe (Join-Path $out 'TeklaMcp.exe')
     if ($LASTEXITCODE -ne 0) { throw "smoke test failed" }
+}
+
+if ($Installer) {
+    $iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe", "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe", "$env:ProgramFiles\Inno Setup 6\ISCC.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $iscc) { throw "Inno Setup 6 (ISCC.exe) not found" }
+    $version = ([xml](Get-Content (Join-Path $PSScriptRoot 'src\TeklaMcp\TeklaMcp.csproj'))).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+    & $iscc /Q "/DAppVersion=$version" (Join-Path $PSScriptRoot 'installer\TeklaMcp.iss')
+    if ($LASTEXITCODE -ne 0) { throw "installer build failed" }
+    "INSTALLER OK -> $(Join-Path $PSScriptRoot "dist\TeklaMcp-Setup-$version.exe")"
 }
 "BUILD OK -> $out\TeklaMcp.exe"

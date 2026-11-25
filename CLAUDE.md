@@ -19,9 +19,10 @@ MCP server (`TeklaMcp.exe`) that connects Claude Desktop and Claude Code to Tekl
 - Phase 1 approved (2026-11-25): MCP stdio server, worker process, safety gate, audit log, `tekla_status`.
 - Phase 2 built (2026-11-25): 12 read-only query/data tools; `tests\integration\phase2.ps1` passes; quantities match Tekla Material List. Approved.
 - Phase 3 built (2026-11-26): 15 two-step write tools (28 tools total); `tests\integration\phase3.ps1 -Apply` passes on SSMC_Tekla (creates MCP_TEST* at x ≥ 100 m, deletes them). Approved 2026-11-26.
-- Phase 7a (installer) in progress.
+- Phase 7a built (2026-11-26): `--register|--unregister desktop|code|all`, `--readonly on|off`, `--doctor`; `installer\TeklaMcp.iss` → `build.ps1 -Installer` → `dist\TeklaMcp-Setup-<ver>.exe`. Silent install/uninstall tested (Desktop + Code entries added/removed, other servers kept). User tested the wizard install: passed (2026-11-26).
+- Phase 8 (combined test + Thai README) in progress.
 - Scope of first round: Phase 0–3 + installer (7a). Do not start Phase 4–7b without user approval.
-- Build: `powershell -ExecutionPolicy Bypass -File build.ps1 [-Smoke]` (restore → build → unit tests → optional stdio smoke test).
+- Build: `powershell -ExecutionPolicy Bypass -File build.ps1 [-Smoke] [-Installer]` (restore → build → unit tests → optional stdio smoke test → optional installer).
 
 ## Decisions
 

@@ -29,17 +29,13 @@ namespace TeklaMcp
                 return WorkerHost.Run(stdin, stdout);
             }
 
+            string exe = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
             if (args.Length > 0)
-            {
-                // --register / --unregister / --doctor arrive in Phase 7a.
-                Console.Error.WriteLine("TeklaMcp " + Protocol.ServerVersion + ": unknown argument '" + args[0] + "'. Run without arguments to start the MCP server (stdio).");
-                return 2;
-            }
+                return Registrar.Run(args, exe, new StreamWriter(stdout) { AutoFlush = true });
 
             Log.Info("TeklaMcp " + Protocol.ServerVersion + " starting. readOnly=" + settings.ReadOnly + " logDir=" + Log.Directory);
 
             // 2. Wire up. This process never loads Tekla; all Tekla calls go to the "--worker" child process.
-            string exe = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
             using (var tekla = new TeklaWorker(exe, TimeSpan.FromSeconds(settings.TeklaTimeoutSeconds)))
             {
                 var registry = new ToolRegistry();
