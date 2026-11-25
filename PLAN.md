@@ -1,6 +1,6 @@
 # Tekla Structures MCP Server — โครงสร้างและแผนงาน (v0.3)
 
-สถานะ: **Phase 0–3 เสร็จ, Phase 7a (installer) สร้างเสร็จ รออนุมัติก่อน Phase 8** (2026-11-26)
+สถานะ: **รอบแรกเสร็จ (Phase 0–3, 7a, 8)** (2026-11-26); Phase 4–7b รออนุมัติ
 เป้าหมาย: Tekla Structures 2026 (Open API NuGet 2026.0.3, .NET Framework 4.8)
 Environment: SE_Asia
 Client: Claude Desktop + Claude Code (server ตัวเดียวกัน)
@@ -167,12 +167,12 @@ Flow 2 ขั้น:
 | 1 | แกนหลัก | MCP handshake ผ่านใน Claude Desktop และ Claude Code; `tekla_status` เชื่อมต่อ Tekla จริงได้; log + safety gate + audit | ✅ เสร็จ |
 | 2 | Query + Data | find/get/selection/quantity/export CSV-XLSX-JSON; ตัวเลขตรงกับ report ของ Tekla | ✅ เสร็จ |
 | 3 | Create/Modify | สร้าง/แก้/ลบ ทุกชนิดในข้อ 4 ผ่าน preview→apply; อ่านค่ากลับตรง | ✅ เสร็จ (2026-11-26) |
-| 7a | Installer | `.exe` ติดตั้งได้; register/unregister Claude Desktop + Code ทำงาน | ✅ สร้างเสร็จ รออนุมัติ (2026-11-26) |
+| 7a | Installer | `.exe` ติดตั้งได้; register/unregister Claude Desktop + Code ทำงาน | ✅ เสร็จ (2026-11-26) |
 | 4 | Validation | validate + clash + geometry check | — |
 | 5 | Drawing | GA/A/W, update, issue, annotation | — |
 | 6 | Export | IFC, PDF, DWG/DXF, NC | — |
 | 7b | Batch | batch_execute | — |
-| 8 | ทดสอบรวม + เอกสาร | test checklist ผ่าน; README ภาษาไทย | ✅ (เฉพาะส่วนรอบแรก) |
+| 8 | ทดสอบรวม + เอกสาร | test checklist ผ่าน; README ภาษาไทย | ✅ เสร็จ (2026-11-26) — `tests\CHECKLIST.md` |
 
 แต่ละ phase จบด้วย: build ผ่าน → ทดสอบกับสำเนาโมเดล → รายงานผลให้ผู้ใช้ก่อนไป phase ถัดไป
 
