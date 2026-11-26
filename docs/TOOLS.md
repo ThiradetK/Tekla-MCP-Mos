@@ -1,6 +1,6 @@
 # Tools
 
-Generated from the server's `tools/list` (TeklaMcp 0.1.0, 28 tools). Units: mm, kg, degrees; coordinates are global.
+Generated from the server's `tools/list` (TeklaMcp 0.1.0, 30 tools). Units: mm, kg, degrees; coordinates are global.
 
 Every WRITE / DESTRUCTIVE tool also takes `mode` (`"preview"` | `"apply"`, required) and `confirm_token` (required for apply). See [SAFETY.md](SAFETY.md).
 
@@ -47,6 +47,13 @@ Every WRITE / DESTRUCTIVE tool also takes `mode` (`"preview"` | `"apply"`, requi
 | `tekla_create_grid` | WRITE | Create a grid. Coordinates use Tekla grid syntax (first value absolute, then spacings, n*spacing allowed), e.g. coordinate_x "0 4*6000", label_x "A B C D E". | `coordinate_x`*, `coordinate_y`*, `coordinate_z`*, `label_x`*, `label_y`*, `label_z`*, `origin_mm`, `name` |
 | `tekla_create_assembly` | WRITE | Build an assembly: the main part's assembly receives the given parts as secondaries (optionally renamed). | `main_part_guid`*, `secondary_part_guids`*, `name` |
 | `tekla_add_to_assembly` | WRITE | Add parts as secondaries to an existing assembly (given by the assembly GUID or any part in it). | `target_guid`*, `part_guids`* |
+
+## Validation
+
+| Tool | Level | What it does | Parameters (* = required) |
+|---|---|---|---|
+| `tekla_validate_model` | READ | Check numbering and assemblies of filtered parts (default: all parts): parts whose numbering is not up to date, parts without an assembly mark or part mark (Tekla shows "(?)"), and model-wide assemblies without a main part. Returns counts and a page of the parts with issues. Read-only; does not run numbering. | `types`, `profile`, `material`, `name`, `class`, `phase`, `uda`, `selection`, `bbox`, `offset`, `limit` |
+| `tekla_clash_check` | READ | Run Tekla's clash check between native parts of the given objects (guids, or a filter; default: all parts). Returns each clash with type (clash, cutthrough, isinside, exactmatch, mindistance, ...) and both objects (no clash size: the API does not provide it). min_distance_mm > 0 also reports objects closer than that distance. Tekla checks the objects selected in the model view, so the selection is replaced during the run and restored afterwards. The model is not changed. The run is stopped after 55 s (settings.json teklaTimeoutSeconds - 5); then results are partial. | `types`, `profile`, `material`, `name`, `class`, `phase`, `uda`, `selection`, `bbox`, `offset`, `limit`, `guids`, `min_distance_mm` |
 
 ## Modify
 

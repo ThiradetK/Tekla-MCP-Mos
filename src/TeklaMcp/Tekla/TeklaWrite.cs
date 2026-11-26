@@ -442,17 +442,19 @@ namespace TeklaMcp.Tekla
             if (!apply) return preview;
 
             var mism = new JArray();
-            var deleted = new List<string>();
+            // Tekla clears the Identifier after Delete(): take the GUIDs first.
+            var guids = objs.Select(Guid).ToList();
             // Delete() returns false for bolts/welds/rebar already removed with their parent part earlier in this loop; judge by read-back.
-            foreach (var o in objs) { o.Delete(); deleted.Add(Guid(o)); }
+            foreach (var o in objs) o.Delete();
             m.CommitChanges();
-            var (stillThere, _) = TeklaQuery.Fetch(m, new JArray(deleted));
-            foreach (var o in stillThere) mism.Add(Guid(o) + " still exists after delete");
+            var (stillThere, _) = TeklaQuery.Fetch(m, new JArray(guids));
+            var left = new HashSet<string>(stillThere.Select(Guid), StringComparer.OrdinalIgnoreCase);
+            foreach (var g in left) mism.Add(g + " still exists after delete");
             var (depLeft, _) = TeklaQuery.Fetch(m, new JArray(dependents.Keys));
             var r2 = new JObject
             {
-                ["summary"] = "Deleted " + (deleted.Count - stillThere.Count) + " of " + objs.Count + " object(s).",
-                ["applied"] = true, ["affected"] = new JArray(objs.Select(Guid)), ["deleted"] = new JArray(deleted.Except(stillThere.Select(Guid))),
+                ["summary"] = "Deleted " + (guids.Count - left.Count) + " of " + objs.Count + " object(s).",
+                ["applied"] = true, ["affected"] = new JArray(guids), ["deleted"] = new JArray(guids.Where(g => !left.Contains(g))),
                 ["attached_objects_remaining"] = depLeft.Count, ["attached_objects_deleted"] = dependents.Count - depLeft.Count,
                 ["verification"] = new JObject { ["ok"] = mism.Count == 0, ["mismatches"] = mism }
             };

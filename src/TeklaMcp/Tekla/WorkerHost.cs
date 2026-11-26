@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
@@ -25,6 +25,7 @@ namespace TeklaMcp.Tekla
             var session = new TeklaSession();
             var query = new TeklaQuery(session);
             var write = new TeklaWrite(session, query);
+            var validate = new TeklaValidate(session);
             var output = new JsonRpcWriter(stdout);
             var input = new StreamReader(stdin, new UTF8Encoding(false));
             Log.Info("Tekla worker started.");
@@ -35,13 +36,13 @@ namespace TeklaMcp.Tekla
                 JObject req;
                 try { req = JObject.Parse(line); }
                 catch (JsonException ex) { Log.Error("worker: bad request line", ex); continue; }
-                output.Send(Handle(session, query, write, req));
+                output.Send(Handle(session, query, write, validate, req));
             }
             Log.Info("Tekla worker stopped (stdin closed).");
             return 0;
         }
 
-        private static JObject Handle(TeklaSession session, TeklaQuery query, TeklaWrite write, JObject req)
+        private static JObject Handle(TeklaSession session, TeklaQuery query, TeklaWrite write, TeklaValidate validate, JObject req)
         {
             var resp = new JObject { ["id"] = req["id"] };
             var args = req["args"] as JObject ?? new JObject();
@@ -64,6 +65,8 @@ namespace TeklaMcp.Tekla
                     case "catalog": result = query.Catalog(args); break;
                     case "run_report": result = query.RunReport(args); break;
                     case "write": result = write.Run(args); break;
+                    case "validate": result = validate.Validate(args); break;
+                    case "clash": result = validate.Clash(args); break;
                     default:
                         throw new TeklaException("unknown_op", "Unknown worker operation: " + req["op"]);
                 }
@@ -93,3 +96,4 @@ namespace TeklaMcp.Tekla
         }
     }
 }
+

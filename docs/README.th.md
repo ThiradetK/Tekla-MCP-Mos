@@ -3,7 +3,7 @@
 เชื่อม **Claude Desktop** และ **Claude Code** เข้ากับ **Tekla Structures 2026** ผ่าน Tekla Open API
 ให้ Claude ค้นหา อ่านข้อมูล สรุปปริมาณ ส่งออกตาราง และสร้าง/แก้ไขชิ้นงานในโมเดลได้ โดยทุกคำสั่งที่เปลี่ยนโมเดลต้องให้ผู้ใช้อนุมัติก่อนเสมอ
 
-- 28 tools: อ่านอย่างเดียว 13 ตัว, เปลี่ยนโมเดล 15 ตัว (รายละเอียดใน [TOOLS.md](TOOLS.md))
+- 30 tools: อ่านอย่างเดียว 15 ตัว (รวม validate และ clash check), เปลี่ยนโมเดล 15 ตัว (รายละเอียดใน [TOOLS.md](TOOLS.md))
 - กฎความปลอดภัย: [SAFETY.md](SAFETY.md)
 - หน่วย: ความยาว mm, น้ำหนัก kg, มุม องศา; พิกัดเป็น global เสมอ
 
@@ -47,6 +47,8 @@
 ## ตัวอย่างคำสั่งในแชต
 
 อ่านข้อมูล (ไม่เปลี่ยนโมเดล):
+- "ตรวจ numbering และ assembly ของโมเดล"
+- "ทำ clash check ชิ้นที่เลือก"
 - "สรุปปริมาณคอนกรีตแยกตาม profile และ material"
 - "สรุปเหล็กเสริมแยกตามขนาด น้ำหนักรวมเท่าไร"
 - "ส่งออก BOQ เป็น Excel ชื่อ boq_tower_a.xlsx"
@@ -132,7 +134,8 @@ Settings → Apps → Installed apps → **Tekla MCP Server** → Uninstall
 - แก้ bolt group ด้วย `tekla_modify_objects` ไม่ได้ (เปลี่ยนได้เฉพาะ uda) ให้ลบแล้วสร้างใหม่
 - `tekla_create_assembly` ไม่ย้ายชิ้นที่เป็น secondary ของ assembly อื่นอยู่แล้ว (เช่น เชื่อมแบบ shop weld) Tekla ไม่ยอมย้าย โปรแกรมจะแจ้งตั้งแต่ preview
 - โมเดลใหญ่: คำสั่งแรกที่อ่าน catalog profile ใช้ราว 13 วินาที (ครั้งต่อไปใช้ cache); สรุปเหล็กเสริมหมื่นเส้นใช้ราว 30 วินาที
-- ยังไม่มี: ตรวจโมเดล/clash, drawing, export IFC/DWG/NC, batch (อยู่ในแผนรอบถัดไป)
+- `tekla_clash_check` ใช้ selection ใน Tekla ระหว่างตรวจ (คืน selection เดิมให้หลังตรวจ) และหยุดเมื่อเกิน `teklaTimeoutSeconds` - 5 วินาที
+- ยังไม่มี: drawing, export IFC/DWG/NC, batch (อยู่ในแผน Phase 5–7b)
 
 ## Build จาก source
 

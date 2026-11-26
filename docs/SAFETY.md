@@ -13,7 +13,7 @@ Tekla Open API **ไม่มี undo** ทุกการเปลี่ยน�
 
 | ระดับ | tool | เงื่อนไข |
 |---|---|---|
-| READ | 13 ตัว เช่น `tekla_find_objects`, `tekla_quantity_summary`, `tekla_export_data` | รันได้ทันที ไม่เปลี่ยนโมเดล (`tekla_select_objects` เปลี่ยนแค่การเลือกในหน้าจอ, `tekla_export_data` / `tekla_run_report` สร้างไฟล์ใหม่ ไม่เขียนทับ) |
+| READ | 15 ตัว เช่น `tekla_find_objects`, `tekla_quantity_summary`, `tekla_clash_check` | รันได้ทันที ไม่เปลี่ยนโมเดล (`tekla_select_objects` เปลี่ยนแค่การเลือกในหน้าจอ, `tekla_clash_check` เปลี่ยน selection ชั่วคราวแล้วคืนให้, `tekla_export_data` / `tekla_run_report` สร้างไฟล์ใหม่ ไม่เขียนทับ) |
 | WRITE | 14 ตัว: สร้าง / แก้ / ย้าย / คัดลอก / assembly / work plane / save | ต้อง preview → อนุมัติ → apply |
 | DESTRUCTIVE | `tekla_delete_objects` | เหมือน WRITE และ preview ต้องแสดงรายการทุกชิ้นที่จะถูกลบ |
 

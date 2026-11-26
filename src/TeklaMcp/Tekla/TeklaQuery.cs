@@ -311,6 +311,15 @@ namespace TeklaMcp.Tekla
             while (en.MoveNext()) if (en.Current != null) yield return en.Current;
         }
 
+        /// <summary>Objects matching the worker filter args (types/selection/bbox/filter) with their brief rows.</summary>
+        internal static List<(JObject row, TSM.ModelObject obj)> Filtered(TSM.Model m, JObject a)
+        {
+            var filter = a["filter"] as JObject ?? new JObject();
+            var list = new List<(JObject, TSM.ModelObject)>();
+            foreach (var o in Enumerate(m, a)) { var row = Brief(o); if (Matches(o, row, filter)) list.Add((row, o)); }
+            return list;
+        }
+
         private static IEnumerable<TSM.ModelObject> Enumerate(TSM.Model m, JObject a)
         {
             var names = a["types"]?.Values<string>().ToList() ?? new List<string>();
