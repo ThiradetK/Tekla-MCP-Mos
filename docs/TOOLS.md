@@ -1,6 +1,6 @@
 # Tools
 
-Generated from the server's `tools/list` (TeklaMcp 0.1.0, 44 tools). Units: mm, kg, degrees; coordinates are global.
+Generated from the server's `tools/list` (TeklaMcp 0.1.0, 45 tools). Units: mm, kg, degrees; coordinates are global.
 
 Every WRITE / DESTRUCTIVE tool also takes `mode` (`"preview"` | `"apply"`, required) and `confirm_token` (required for apply). See [SAFETY.md](SAFETY.md).
 
@@ -77,7 +77,7 @@ Every WRITE / DESTRUCTIVE tool also takes `mode` (`"preview"` | `"apply"`, requi
 |---|---|---|---|
 | `tekla_export_ifc` | READ | Export the model (or the objects selected in Tekla) to IFC 2x3, IFC4 or IFC4.3 with Tekla's IFC export: global or work-plane coordinates, layers by name, colors by class, optional bolts/welds/rebars/grids/assemblies. Tekla also writes a .htm summary and a .partReport next to the .ifc. Output goes to a new folder in the export folder (settings.json exportDir, default Documents\TeklaMcp\exports); an existing folder is never overwritten. The model is not changed. | `file_name`*, `version`, `view`, `selection`, `base_point`, `bolts`, `welds`, `rebars`, `grids`, `assemblies` |
 | `tekla_export_nc` | READ | Create NC files (DSTV) for steel parts of the model or of the objects selected in Tekla, with an NC settings file of the environment (SE_Asia: "DSTV for Profile", "DSTV for Plate", "DSTV for Angle"; an unknown name returns the list). Numbering must be up to date. Output goes to a new folder in the export folder (settings.json exportDir, default Documents\TeklaMcp\exports); an existing folder is never overwritten. The model is not changed. | `folder_name`*, `settings`*, `selection` |
-| `tekla_export_drawings` | READ | Export drawings to PDF, DWG or DXF (1-5 per call, by drawing_id from tekla_list_drawings). The Open API cannot do this in Tekla 2026, so the server drives Tekla's own Document manager > Print / Export with a temporary macro (a few seconds per drawing; Tekla's Document manager and dialogs open briefly, and they remember the folder and options used). File names follow Tekla's naming (contain the drawing mark); the Educational license adds a watermark to PDFs. No drawing may be open in the editor. Output goes to a new folder in the export folder (settings.json exportDir, default Documents\TeklaMcp\exports); an existing folder is never overwritten. The model is not changed. | `folder_name`*, `drawing_ids`*, `format` |
+| `tekla_export_drawings` | READ | Export drawings to PDF, DWG or DXF (1-5 per call, by drawing_id from tekla_list_drawings). The Open API cannot do this in Tekla 2026, so the server drives Tekla's own Document manager > Print / Export with a temporary macro (5-10 s per drawing, over 30 s for a large GA sheet; Tekla's Document manager and dialogs open briefly, and they remember the folder and options used). Each file is identified by the drawing's plot file name (Tekla's naming); the Document manager row order is not predictable, so wrong rows are retried and their files deleted; the Educational license adds a watermark to PDFs. No drawing may be open in the editor. Output goes to a new folder in the export folder (settings.json exportDir, default Documents\TeklaMcp\exports); an existing folder is never overwritten. The model is not changed. | `folder_name`*, `drawing_ids`*, `format` |
 
 ## Modify
 
@@ -87,4 +87,5 @@ Every WRITE / DESTRUCTIVE tool also takes `mode` (`"preview"` | `"apply"`, requi
 | `tekla_move_objects` | WRITE | Move objects by a vector (global mm). Max 500 objects. | `guids`*, `vector_mm`* |
 | `tekla_copy_objects` | WRITE | Copy objects by a vector (global mm); count > 1 makes repeated copies at 1x, 2x, ... the vector. Returns the new GUIDs. | `guids`*, `vector_mm`*, `count` |
 | `tekla_delete_objects` | DESTRUCTIVE | Delete objects by GUID (max 500). Bolts, welds and rebar attached to deleted parts may be deleted too; the preview lists them. | `guids`* |
+| `tekla_batch_execute` | DESTRUCTIVE | Run up to 100 model write steps (create beam/column/plate/bolts/weld/rebar/grid, assemblies, modify, move, copy, delete) with ONE preview and ONE confirm_token. Later steps can use objects created by earlier steps via "{{stepN.guid}}" / "{{stepN.guids[K]}}"; such steps are only argument-checked in the preview (marked deferred). Apply runs the steps in order and STOPS at the first error or read-back mismatch; completed steps stay (no undo). Treated as DESTRUCTIVE: the preview lists every step and every object to be deleted. | `steps`* |
 

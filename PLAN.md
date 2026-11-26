@@ -1,6 +1,6 @@
-# Tekla Structures MCP Server — โครงสร้างและแผนงาน (v0.3)
+﻿# Tekla Structures MCP Server — โครงสร้างและแผนงาน (v0.3)
 
-สถานะ: **รอบแรกเสร็จ (Phase 0–3, 7a, 8)**; รอบสอง Phase 4–7b อนุมัติแล้ว กำลังทำ Phase 4 (2026-11-26)
+สถานะ: **รอบแรกเสร็จ (Phase 0–3, 7a, 8)**; **รอบสองเสร็จ (Phase 4, 5, 6, 7b)** (2026-11-26)
 เป้าหมาย: Tekla Structures 2026 (Open API NuGet 2026.0.3, .NET Framework 4.8)
 Environment: SE_Asia
 Client: Claude Desktop + Claude Code (server ตัวเดียวกัน)
@@ -168,10 +168,10 @@ Flow 2 ขั้น:
 | 2 | Query + Data | find/get/selection/quantity/export CSV-XLSX-JSON; ตัวเลขตรงกับ report ของ Tekla | ✅ เสร็จ |
 | 3 | Create/Modify | สร้าง/แก้/ลบ ทุกชนิดในข้อ 4 ผ่าน preview→apply; อ่านค่ากลับตรง | ✅ เสร็จ (2026-11-26) |
 | 7a | Installer | `.exe` ติดตั้งได้; register/unregister Claude Desktop + Code ทำงาน | ✅ เสร็จ (2026-11-26) |
-| 4 | Validation | validate + clash + geometry check | — |
-| 5 | Drawing | GA/A/W, update, issue, annotation | — |
-| 6 | Export | IFC, PDF, DWG/DXF, NC | — |
-| 7b | Batch | batch_execute | — |
+| 4 | Validation | validate + clash + geometry check | ✅ เสร็จ (รอบ 2) — validate (numbering/assembly) + clash; geometry ตัดออก (D11) |
+| 5 | Drawing | GA/A/W, update, issue, annotation | ✅ เสร็จ (รอบ 2) — + numbering (D10) |
+| 6 | Export | IFC, PDF, DWG/DXF, NC | ✅ เสร็จ (รอบ 2) — PDF/DWG/DXF ผ่าน macro (D9, D13) |
+| 7b | Batch | batch_execute | ✅ เสร็จ (รอบ 2) — D15 |
 | 8 | ทดสอบรวม + เอกสาร | test checklist ผ่าน; README ภาษาไทย | ✅ เสร็จ (2026-11-26) — `tests\CHECKLIST.md` |
 
 แต่ละ phase จบด้วย: build ผ่าน → ทดสอบกับสำเนาโมเดล → รายงานผลให้ผู้ใช้ก่อนไป phase ถัดไป
@@ -217,6 +217,7 @@ Flow 2 ขั้น:
 | D12 | โมเดลทดสอบ Phase 4–6 | ใช้ SSMC_Tekla ตามเดิม (drawing/numbering ที่ทดสอบสร้างจะอยู่ในโมเดล ถ้าไม่ลบ) |
 | D13 | PDF ของ drawing | `PrintDrawing` ผ่าน API ไม่เขียนไฟล์ (Educational) → ผู้ใช้เลือกใช้ macro ผ่าน UI: Document manager → Print (WPF macro) |
 | D14 | IFC2x3 | ใช้ `CreateIFC2x3Export` (API IFC4 ที่ระบุเวอร์ชัน 2x3 ยังได้ IFC4) |
+| D15 | Batch (7b) | `tekla_batch_execute`: เฉพาะ tool เขียนโมเดล (create/assembly/modify/move/copy/delete); อ้างผลขั้นก่อนได้ (`{{stepN.guid}}`); apply ล้มกลางทาง → หยุด เก็บขั้นที่ทำแล้ว ไม่ undo; สูงสุด 100 ขั้น; preview + confirm_token เดียวทั้ง batch |
 
 ## 9. ความเสี่ยง
 
@@ -224,3 +225,5 @@ Flow 2 ขั้น:
 - โมเดลใหญ่: query ต้องมี paging/limit กันข้อมูลล้น context
 - ไม่มี undo ผ่าน API → พึ่ง preview + save ก่อนแก้
 - ไม่มี cert → บางองค์กรอาจบล็อกการติดตั้ง exe ที่ไม่เซ็น
+
+

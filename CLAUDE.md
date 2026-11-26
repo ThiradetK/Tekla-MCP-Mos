@@ -25,7 +25,7 @@ MCP server (`TeklaMcp.exe`) that connects Claude Desktop and Claude Code to Tekl
 - Phase 4 built (2026-11-26): `tekla_validate_model`, `tekla_clash_check` (30 tools); `tests\integration\phase4.ps1` read-only and `-Apply` (known clash on 2 test beams, run with permission 2026-11-26) pass. Approved 2026-11-26.
 - Phase 5 built (2026-11-26): 11 drawing/numbering tools (41 total); `tests\integration\phase5.ps1` read-only and `-Apply` (without numbering, permission 2026-11-26) pass; `tests\integration\phase5-extra.ps1` (user asked 2026-11-26) passes: real numbering run (87 parts numbered, macro removed), assembly + single-part drawings of a test steel beam, text survives save + reopen (checked with spike probe6). SSMC_Tekla is now fully numbered (not saved). Full numbering tested (`numbering-full.ps1`). Approved 2026-11-26.
 - Phase 6 in progress (2026-11-26): `tekla_export_ifc` (2x3/4/4.3) and `tekla_export_nc` built (43 tools); `tests\integration\phase6.ps1` files-only and `-Apply` (NC with steel test parts, permission 2026-11-26) pass. `tekla_export_drawings` (PDF/DWG/DXF via WPF macro, 44 tools) passes in `phase6.ps1` (2 PDFs, DWG, DXF, correct drawings, no dialogs left). Extra tests (user asked): GA [1] PDF (1.6 MB, 48 s), 5 drawings in one call (70 s), filtered Document manager category → wrong file deleted + error, then fixed by resetting the category in the macro. With screen access: sorted list and multidrawing tested → row order is not predictable, so the tool now guesses a row, identifies each file by `Drawing.GetPlotFileName(false)`, keeps files of requested drawings, deletes others and retries (max 10 rows per drawing); multidrawing + GA + 2 CU exported correctly; 5 drawings with shuffled order correct in 65 s. Approved 2026-11-26.
-- Phase 7b (`tekla_batch_execute`) in progress.
+- Phase 7b built (2026-11-26): `tekla_batch_execute` (45 tools; D15: model write tools, `{{stepN.guid}}` refs, stop on first failure, ≤100 steps, DESTRUCTIVE level, one audit entry). 90 unit tests; `tests\integration\phase7b.ps1` preview and `-Apply` (permission 2026-11-26: 9-step batch with refs applied in 0.9 s and deleted its own objects; failing batch stopped at step 2, step 1 kept) pass. Approved 2026-11-26. Round 2 complete; pushed to GitHub.
 - Scope of first round: Phase 0–3 + installer (7a) + docs (8). Round 2: Phase 4–7b.
 - Build: `powershell -ExecutionPolicy Bypass -File build.ps1 [-Smoke] [-Installer]` (restore → build → unit tests → optional stdio smoke test → optional installer).
 
@@ -46,7 +46,7 @@ MCP server (`TeklaMcp.exe`) that connects Claude Desktop and Claude Code to Tekl
 4. If a planned API does not exist or fails, report it with alternatives. Do not silently switch approach.
 5. End each phase with: build passes → test against the model copy → report results → wait for approval.
 6. Keep answers short and factual. Separate "what the user asked" from "what Claude proposes".
-7. Git: commit before starting each new phase. After the last phase of the round (Phase 8) is approved, push to `https://github.com/ThiradetK/Tekla-MCP-Mos.git`. No other pushes.
+7. Git: commit before starting each new phase. After the last phase of a round is approved (round 1: Phase 8; round 2: Phase 7b), push to `https://github.com/ThiradetK/Tekla-MCP-Mos.git`. No other pushes. Stage explicit paths; the user's own `skills/` folder is not part of the commits.
 
 ## Tekla model safety (mandatory)
 

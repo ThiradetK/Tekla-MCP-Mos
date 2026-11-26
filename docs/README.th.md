@@ -3,7 +3,7 @@
 เชื่อม **Claude Desktop** และ **Claude Code** เข้ากับ **Tekla Structures 2026** ผ่าน Tekla Open API
 ให้ Claude ค้นหา อ่านข้อมูล สรุปปริมาณ ส่งออกตาราง และสร้าง/แก้ไขชิ้นงานในโมเดลได้ โดยทุกคำสั่งที่เปลี่ยนโมเดลต้องให้ผู้ใช้อนุมัติก่อนเสมอ
 
-- 44 tools: อ่านอย่างเดียว 21 ตัว (รวม validate, clash check, รายการ drawing, export IFC/NC/PDF/DWG/DXF), เปลี่ยนโมเดล/drawing 23 ตัว (รายละเอียดใน [TOOLS.md](TOOLS.md))
+- 45 tools: อ่านอย่างเดียว 21 ตัว (รวม validate, clash check, รายการ drawing, export IFC/NC/PDF/DWG/DXF), เปลี่ยนโมเดล/drawing 24 ตัว รวม `tekla_batch_execute` (รายละเอียดใน [TOOLS.md](TOOLS.md))
 - กฎความปลอดภัย: [SAFETY.md](SAFETY.md)
 - หน่วย: ความยาว mm, น้ำหนัก kg, มุม องศา; พิกัดเป็น global เสมอ
 
@@ -142,7 +142,7 @@ Settings → Apps → Installed apps → **Tekla MCP Server** → Uninstall
   - ระหว่าง export หน้าต่าง Document manager / Print / Export ของ Tekla จะเปิดขึ้นชั่วครู่แล้วปิดเอง และจะจำโฟลเดอร์/ตัวเลือกล่าสุดไว้
   - ห้ามเปิด drawing ค้างใน editor; โปรแกรมสลับ Document manager ไปหมวด "All drawings" และตรวจชื่อไฟล์กับ plot file name ของ drawing ทุกครั้ง ถ้าแถวที่เลือกเป็นแผ่นอื่น (เช่น list ถูก sort ไว้) จะลบไฟล์นั้นแล้วลองแถวถัดไป (สูงสุด 10 แถวต่อแผ่น)
   - license Educational ใส่ลายน้ำใน PDF
-- ยังไม่มี: batch (Phase 7b)
+- `tekla_batch_execute`: รวมคำสั่งแก้โมเดลได้ถึง 100 ขั้นใน preview + อนุมัติครั้งเดียว ขั้นหลังอ้าง object ที่ขั้นก่อนสร้างได้ด้วย `{{stepN.guid}}` หรือ `{{stepN.guids[K]}}` (ขั้นที่อ้างจะถูกตรวจแค่ argument ตอน preview และตรวจเต็มตอน apply) ถ้าขั้นใดล้มตอน apply จะหยุดทันที ขั้นที่ทำไปแล้วไม่ถูก undo
 
 ## Build จาก source
 

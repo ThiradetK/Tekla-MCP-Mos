@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.IO;
 using TeklaMcp.Core;
 using TeklaMcp.Mcp;
@@ -42,7 +43,9 @@ namespace TeklaMcp
                 registry.Add(new StatusTool(tekla, settings));
                 foreach (var t in Tools.Query.QueryTools.Create(tekla)) registry.Add(t);
                 foreach (var t in Tools.Data.DataTools.Create(tekla, settings)) registry.Add(t);
-                foreach (var t in Tools.Modify.WriteTools.Create(tekla)) registry.Add(t);
+                var writeTools = Tools.Modify.WriteTools.Create(tekla).ToList();
+                foreach (var t in writeTools) registry.Add(t);
+                registry.Add(new Tools.Modify.BatchTool(Tools.Modify.WriteTools.BatchSteps(writeTools)));
                 foreach (var t in Tools.Validation.ValidationTools.Create(tekla, settings)) registry.Add(t);
                 foreach (var t in Tools.Drawing.DrawingTools.Create(tekla)) registry.Add(t);
                 foreach (var t in Tools.Export.ExportTools.Create(tekla, settings)) registry.Add(t);
@@ -56,4 +59,5 @@ namespace TeklaMcp
         }
     }
 }
+
 

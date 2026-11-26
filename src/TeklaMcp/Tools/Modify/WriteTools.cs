@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using TeklaMcp.Core;
@@ -45,6 +46,16 @@ namespace TeklaMcp.Tools.Modify
     /// <summary>Phase 3 tools (PLAN §4 "Create" / "Modify" + tekla_save_model).</summary>
     internal static class WriteTools
     {
+        /// <summary>Tools allowed as steps of tekla_batch_execute (D15: model write tools; not work plane or save).</summary>
+        public static readonly string[] BatchStepNames =
+        {
+            "tekla_create_beam", "tekla_create_column", "tekla_create_plate", "tekla_create_bolts", "tekla_create_weld", "tekla_create_rebar",
+            "tekla_create_grid", "tekla_create_assembly", "tekla_add_to_assembly", "tekla_modify_objects", "tekla_move_objects",
+            "tekla_copy_objects", "tekla_delete_objects"
+        };
+
+        public static IEnumerable<IWriteTool> BatchSteps(IEnumerable<ITool> tools) => tools.OfType<IWriteTool>().Where(t => BatchStepNames.Contains(t.Name));
+
         public const string TwoStep = " Two steps: call with mode=\"preview\" (nothing changes; returns the planned change and a confirm_token), show it to the user, " +
                                       "then call again with identical arguments, mode=\"apply\" and the confirm_token ONLY after the user explicitly approves. " +
                                       "After apply the objects are committed and read back; 'verification' reports any mismatch. Global coordinates in mm; there is no undo.";
@@ -216,3 +227,4 @@ namespace TeklaMcp.Tools.Modify
         }
     }
 }
+
