@@ -23,7 +23,8 @@ MCP server (`TeklaMcp.exe`) that connects Claude Desktop and Claude Code to Tekl
 - Phase 8 built (2026-11-26): `docs\README.th.md`, `docs\TOOLS.md` (generated from tools/list), `docs\SAFETY.md`, `tests\CHECKLIST.md`; automated checklist A1–A5, A7 pass. Approved 2026-11-26; pushed to GitHub. Round 1 complete.
 - Round 2 approved 2026-11-26: Phase 4 → 5 → 6 → 7b, each ends with report + approval. Decisions D8–D12 in `PLAN.md` §8.
 - Phase 4 built (2026-11-26): `tekla_validate_model`, `tekla_clash_check` (30 tools); `tests\integration\phase4.ps1` read-only and `-Apply` (known clash on 2 test beams, run with permission 2026-11-26) pass. Approved 2026-11-26.
-- Phase 5 (drawings + `tekla_run_numbering`) in progress.
+- Phase 5 built (2026-11-26): 11 drawing/numbering tools (41 total); `tests\integration\phase5.ps1` read-only and `-Apply` (without numbering, permission 2026-11-26) pass; `tests\integration\phase5-extra.ps1` (user asked 2026-11-26) passes: real numbering run (87 parts numbered, macro removed), assembly + single-part drawings of a test steel beam, text survives save + reopen (checked with spike probe6). SSMC_Tekla is now fully numbered (not saved). Full numbering tested (`numbering-full.ps1`). Approved 2026-11-26.
+- Phase 6 (export: IFC, PDF, DWG/DXF via macro, NC/DSTV) in progress.
 - Scope of first round: Phase 0–3 + installer (7a) + docs (8). Round 2: Phase 4–7b.
 - Build: `powershell -ExecutionPolicy Bypass -File build.ps1 [-Smoke] [-Installer]` (restore → build → unit tests → optional stdio smoke test → optional installer).
 
@@ -94,5 +95,8 @@ MCP server (`TeklaMcp.exe`) that connects Claude Desktop and Claude Code to Tekl
 - Clash check works from the external worker: `Events.ClashDetected` / `ClashCheckDone` + `Register()`. It checks the objects selected in the model view (`UI.ModelObjectSelector.Select`), so save and restore the user's selection. SSMC_Tekla has 0 clashes (no intersecting part pairs).
 - Clash events carry objects with only the identifier (Name reads "BEAM") → `Model.SelectModelObject(id)` before reading fields. `ClashCheckData.Overlap` = 0 and `GetIntersectionBoundingBoxes` returns an empty list for two crossing beams → no clash size is reported.
 - `ModelObject.Delete()` clears the object's Identifier (GUID becomes all zeros) → take GUIDs before deleting.
-- Numbering: only `Operation.IsNumberingUpToDate(All)`; no API runs numbering. Unnumbered marks show "(?)" in ASSEMBLY_POS / PART_POS.
+- Numbering: only `Operation.IsNumberingUpToDate(All)`; no API runs numbering. Unnumbered marks show "(?)" in ASSEMBLY_POS / PART_POS. `tekla_run_numbering` writes a temporary macro using commands from Tekla's shipped macros: `akit.Callback("acmd_partnumbers_all", "" | "full", "main_frame")` (+ `PushButton("warning_ok", "full_numbering_ok")` for full).
+- Proof that numbering ran: Tekla rewrites `<model>\logs\numberingresults.log` (full run shows "Diagnose & Repair Numbering: All"; written even when nothing needs numbering). `tekla_run_numbering` waits for it and returns the counts. Full numbering on an already numbered SSMC_Tekla changed 0 marks; drawings stayed up to date (`tests\integration\numbering-full.ps1 [-Scope modified]`).
+- `XS_MACRO_DIRECTORY` = `C:\ProgramData\...\environments\common\macros` (writable) ; `...\bin\Env\Common\Macros\` (not writable). `Operation.RunMacro("file.cs")` runs from `<dir>\modeling`; `IsMacroRunning()` is false right after start, so poll the result.
+- Drawings have no public GUID/Identifier → `drawing_id` = type|mark|CreationDate. `UpdateDrawing` and `Delete` refuse the open drawing; `SetActiveDrawing` throws if not up to date.
 - Building while Claude Desktop/Code run the dev server fails (exe locked): stop `TeklaMcp` processes first.

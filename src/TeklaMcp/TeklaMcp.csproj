@@ -22,6 +22,7 @@
     <!-- Tekla Open API: compile-time only. Runtime DLLs come from the local Tekla install (Tekla/AssemblyResolver.cs). -->
     <PackageReference Include="Tekla.Structures" Version="2026.0.3" ExcludeAssets="runtime" />
     <PackageReference Include="Tekla.Structures.Model" Version="2026.0.3" ExcludeAssets="runtime" />
+    <PackageReference Include="Tekla.Structures.Drawing" Version="2026.0.3" ExcludeAssets="runtime" />
     <PackageReference Include="Tekla.Structures.Catalogs" Version="2026.0.3" ExcludeAssets="runtime" />
     <PackageReference Include="Tekla.Structures.Datatype" Version="2026.0.3" ExcludeAssets="runtime" />
   </ItemGroup>

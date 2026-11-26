@@ -44,6 +44,7 @@ namespace TeklaMcp
                 foreach (var t in Tools.Data.DataTools.Create(tekla, settings)) registry.Add(t);
                 foreach (var t in Tools.Modify.WriteTools.Create(tekla)) registry.Add(t);
                 foreach (var t in Tools.Validation.ValidationTools.Create(tekla, settings)) registry.Add(t);
+                foreach (var t in Tools.Drawing.DrawingTools.Create(tekla)) registry.Add(t);
 
                 var gate = new SafetyGate(settings,
                     new ConfirmTokenStore(TimeSpan.FromMinutes(settings.ConfirmTokenMinutes)),

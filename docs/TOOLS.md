@@ -1,6 +1,6 @@
 # Tools
 
-Generated from the server's `tools/list` (TeklaMcp 0.1.0, 30 tools). Units: mm, kg, degrees; coordinates are global.
+Generated from the server's `tools/list` (TeklaMcp 0.1.0, 41 tools). Units: mm, kg, degrees; coordinates are global.
 
 Every WRITE / DESTRUCTIVE tool also takes `mode` (`"preview"` | `"apply"`, required) and `confirm_token` (required for apply). See [SAFETY.md](SAFETY.md).
 
@@ -54,6 +54,22 @@ Every WRITE / DESTRUCTIVE tool also takes `mode` (`"preview"` | `"apply"`, requi
 |---|---|---|---|
 | `tekla_validate_model` | READ | Check numbering and assemblies of filtered parts (default: all parts): parts whose numbering is not up to date, parts without an assembly mark or part mark (Tekla shows "(?)"), and model-wide assemblies without a main part. Returns counts and a page of the parts with issues. Read-only; does not run numbering. | `types`, `profile`, `material`, `name`, `class`, `phase`, `uda`, `selection`, `bbox`, `offset`, `limit` |
 | `tekla_clash_check` | READ | Run Tekla's clash check between native parts of the given objects (guids, or a filter; default: all parts). Returns each clash with type (clash, cutthrough, isinside, exactmatch, mindistance, ...) and both objects (no clash size: the API does not provide it). min_distance_mm > 0 also reports objects closer than that distance. Tekla checks the objects selected in the model view, so the selection is replaced during the run and restored afterwards. The model is not changed. The run is stopped after 55 s (settings.json teklaTimeoutSeconds - 5); then results are partial. | `types`, `profile`, `material`, `name`, `class`, `phase`, `uda`, `selection`, `bbox`, `offset`, `limit`, `guids`, `min_distance_mm` |
+
+## Drawing
+
+| Tool | Level | What it does | Parameters (* = required) |
+|---|---|---|---|
+| `tekla_list_drawings` | READ | List drawings in the open model (drawing list): drawing_id, type (ga, assembly, single_part, cast_unit, multi), mark, name, titles, up-to-date status, issued/locked/frozen flags, whether it is open, dates and sheet size in mm. Filters: types, mark/name wildcards, up_to_date, issued. Drawings are referenced by drawing_id from tekla_list_drawings ("type\|mark\|created"; the Open API has no drawing GUID). | `offset`, `limit`, `types`, `mark`, `name`, `up_to_date`, `issued` |
+| `tekla_get_drawing` | READ | Details of one drawing: list fields, its views (name, type, scale, size in mm) and the model objects it shows (brief rows, paged). Drawings are referenced by drawing_id from tekla_list_drawings ("type\|mark\|created"; the Open API has no drawing GUID). | `offset`, `limit`, `drawing_id`* |
+| `tekla_open_drawing` | READ | Open a drawing in the Tekla drawing editor (UI only; nothing is saved or changed). Needed before tekla_add_drawing_text. Close it with tekla_close_drawing. Drawings are referenced by drawing_id from tekla_list_drawings ("type\|mark\|created"; the Open API has no drawing GUID). | `drawing_id`* |
+| `tekla_create_drawing` | WRITE | Create a drawing with a drawing attributes file (default "standard"). kind=ga needs name; assembly, single_part and cast_unit need part_guid (the part's assembly / the part / its cast unit) and up-to-date numbering. Optionally open it in the editor. | `kind`*, `part_guid`, `name`, `attributes`, `open` |
+| `tekla_modify_drawings` | WRITE | Change drawing name and titles. The preview shows from -> to for every drawing. | `drawing_ids`*, `set`* |
+| `tekla_add_drawing_text` | WRITE | Add a text annotation to the sheet of the drawing that is open in the editor, at point_mm [x, y] in sheet coordinates (mm from the sheet's lower-left corner). Save it by closing the drawing with save=true. | `drawing_id`*, `text`*, `point_mm`* |
+| `tekla_close_drawing` | WRITE | Close the drawing editor. save=true (default) saves the open drawing; save=false discards its unsaved changes. | `save` |
+| `tekla_update_drawings` | WRITE | Update drawings (same as Update in the drawing list). The drawings must not be open, and numbering must be up to date. | `drawing_ids`* |
+| `tekla_issue_drawings` | WRITE | Issue (issue=true, default) or unissue (issue=false) drawings. | `drawing_ids`*, `issue` |
+| `tekla_delete_drawings` | DESTRUCTIVE | Delete drawings (max 200). An open drawing cannot be deleted. | `drawing_ids`* |
+| `tekla_run_numbering` | WRITE | Run Tekla numbering with the model's numbering settings. scope=modified (default) numbers new and changed objects; scope=full renumbers everything (existing marks may change). Needed before assembly, single-part and cast-unit drawings. The Open API has no numbering call, so this runs Tekla's numbering command through a temporary macro file in the XS_MACRO_DIRECTORY modeling folder (deleted afterwards). | `scope` |
 
 ## Modify
 

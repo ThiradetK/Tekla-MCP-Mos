@@ -3,7 +3,7 @@
 เชื่อม **Claude Desktop** และ **Claude Code** เข้ากับ **Tekla Structures 2026** ผ่าน Tekla Open API
 ให้ Claude ค้นหา อ่านข้อมูล สรุปปริมาณ ส่งออกตาราง และสร้าง/แก้ไขชิ้นงานในโมเดลได้ โดยทุกคำสั่งที่เปลี่ยนโมเดลต้องให้ผู้ใช้อนุมัติก่อนเสมอ
 
-- 30 tools: อ่านอย่างเดียว 15 ตัว (รวม validate และ clash check), เปลี่ยนโมเดล 15 ตัว (รายละเอียดใน [TOOLS.md](TOOLS.md))
+- 41 tools: อ่านอย่างเดียว 18 ตัว (รวม validate, clash check, รายการ drawing), เปลี่ยนโมเดล/drawing 23 ตัว (รายละเอียดใน [TOOLS.md](TOOLS.md))
 - กฎความปลอดภัย: [SAFETY.md](SAFETY.md)
 - หน่วย: ความยาว mm, น้ำหนัก kg, มุม องศา; พิกัดเป็น global เสมอ
 
@@ -135,7 +135,9 @@ Settings → Apps → Installed apps → **Tekla MCP Server** → Uninstall
 - `tekla_create_assembly` ไม่ย้ายชิ้นที่เป็น secondary ของ assembly อื่นอยู่แล้ว (เช่น เชื่อมแบบ shop weld) Tekla ไม่ยอมย้าย โปรแกรมจะแจ้งตั้งแต่ preview
 - โมเดลใหญ่: คำสั่งแรกที่อ่าน catalog profile ใช้ราว 13 วินาที (ครั้งต่อไปใช้ cache); สรุปเหล็กเสริมหมื่นเส้นใช้ราว 30 วินาที
 - `tekla_clash_check` ใช้ selection ใน Tekla ระหว่างตรวจ (คืน selection เดิมให้หลังตรวจ) และหยุดเมื่อเกิน `teklaTimeoutSeconds` - 5 วินาที
-- ยังไม่มี: drawing, export IFC/DWG/NC, batch (อยู่ในแผน Phase 5–7b)
+- Drawing ไม่มี GUID ใน Open API จึงอ้างด้วย `drawing_id` = "ชนิด|mark|เวลาสร้าง" จาก `tekla_list_drawings`
+- `tekla_run_numbering` ไม่มี API ตรง จึงเขียน macro ชั่วคราวลงโฟลเดอร์ `XS_MACRO_DIRECTORY\modeling` แล้วลบทิ้งหลังรัน
+- ยังไม่มี: export IFC/PDF/DWG/NC, batch (อยู่ในแผน Phase 6–7b)
 
 ## Build จาก source
 
