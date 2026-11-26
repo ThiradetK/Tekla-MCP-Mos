@@ -3,7 +3,7 @@
 เชื่อม **Claude Desktop** และ **Claude Code** เข้ากับ **Tekla Structures 2026** ผ่าน Tekla Open API
 ให้ Claude ค้นหา อ่านข้อมูล สรุปปริมาณ ส่งออกตาราง และสร้าง/แก้ไขชิ้นงานในโมเดลได้ โดยทุกคำสั่งที่เปลี่ยนโมเดลต้องให้ผู้ใช้อนุมัติก่อนเสมอ
 
-- 41 tools: อ่านอย่างเดียว 18 ตัว (รวม validate, clash check, รายการ drawing), เปลี่ยนโมเดล/drawing 23 ตัว (รายละเอียดใน [TOOLS.md](TOOLS.md))
+- 44 tools: อ่านอย่างเดียว 21 ตัว (รวม validate, clash check, รายการ drawing, export IFC/NC/PDF/DWG/DXF), เปลี่ยนโมเดล/drawing 23 ตัว (รายละเอียดใน [TOOLS.md](TOOLS.md))
 - กฎความปลอดภัย: [SAFETY.md](SAFETY.md)
 - หน่วย: ความยาว mm, น้ำหนัก kg, มุม องศา; พิกัดเป็น global เสมอ
 
@@ -137,7 +137,12 @@ Settings → Apps → Installed apps → **Tekla MCP Server** → Uninstall
 - `tekla_clash_check` ใช้ selection ใน Tekla ระหว่างตรวจ (คืน selection เดิมให้หลังตรวจ) และหยุดเมื่อเกิน `teklaTimeoutSeconds` - 5 วินาที
 - Drawing ไม่มี GUID ใน Open API จึงอ้างด้วย `drawing_id` = "ชนิด|mark|เวลาสร้าง" จาก `tekla_list_drawings`
 - `tekla_run_numbering` ไม่มี API ตรง จึงเขียน macro ชั่วคราวลงโฟลเดอร์ `XS_MACRO_DIRECTORY\modeling` แล้วลบทิ้งหลังรัน
-- ยังไม่มี: export IFC/PDF/DWG/NC, batch (อยู่ในแผน Phase 6–7b)
+- Export IFC (2x3 / 4 / 4.3) และ NC (DSTV) เขียนลงโฟลเดอร์ใหม่ใน `exportDir` ทุกครั้ง (ไม่เขียนทับ)
+- Export drawing เป็น PDF / DWG / DXF (`tekla_export_drawings`, ครั้งละ 1–5 แผ่น): Open API ทำไม่ได้ จึงสั่งผ่าน Document manager ของ Tekla ด้วย macro ชั่วคราว
+  - ระหว่าง export หน้าต่าง Document manager / Print / Export ของ Tekla จะเปิดขึ้นชั่วครู่แล้วปิดเอง และจะจำโฟลเดอร์/ตัวเลือกล่าสุดไว้
+  - ห้ามเปิด drawing ค้างใน editor; โปรแกรมสลับ Document manager ไปหมวด "All drawings" และตรวจชื่อไฟล์กับ plot file name ของ drawing ทุกครั้ง ถ้าแถวที่เลือกเป็นแผ่นอื่น (เช่น list ถูก sort ไว้) จะลบไฟล์นั้นแล้วลองแถวถัดไป (สูงสุด 10 แถวต่อแผ่น)
+  - license Educational ใส่ลายน้ำใน PDF
+- ยังไม่มี: batch (Phase 7b)
 
 ## Build จาก source
 

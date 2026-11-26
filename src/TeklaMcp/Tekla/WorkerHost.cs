@@ -27,6 +27,8 @@ namespace TeklaMcp.Tekla
             var write = new TeklaWrite(session, query);
             var validate = new TeklaValidate(session);
             var drawing = new TeklaDrawing(session);
+            var export = new TeklaExport(session);
+            var drawingExport = new TeklaDrawingExport(session);
             var output = new JsonRpcWriter(stdout);
             var input = new StreamReader(stdin, new UTF8Encoding(false));
             Log.Info("Tekla worker started.");
@@ -37,13 +39,13 @@ namespace TeklaMcp.Tekla
                 JObject req;
                 try { req = JObject.Parse(line); }
                 catch (JsonException ex) { Log.Error("worker: bad request line", ex); continue; }
-                output.Send(Handle(session, query, write, validate, drawing, req));
+                output.Send(Handle(session, query, write, validate, drawing, export, drawingExport, req));
             }
             Log.Info("Tekla worker stopped (stdin closed).");
             return 0;
         }
 
-        private static JObject Handle(TeklaSession session, TeklaQuery query, TeklaWrite write, TeklaValidate validate, TeklaDrawing drawing, JObject req)
+        private static JObject Handle(TeklaSession session, TeklaQuery query, TeklaWrite write, TeklaValidate validate, TeklaDrawing drawing, TeklaExport export, TeklaDrawingExport drawingExport, JObject req)
         {
             var resp = new JObject { ["id"] = req["id"] };
             var args = req["args"] as JObject ?? new JObject();
@@ -72,6 +74,9 @@ namespace TeklaMcp.Tekla
                     case "drawings": result = drawing.List(args); break;
                     case "drawing_get": result = drawing.Get(args); break;
                     case "drawing_open": result = drawing.Open(args); break;
+                    case "export_ifc": result = export.Ifc(args); break;
+                    case "export_nc": result = export.Nc(args); break;
+                    case "export_drawings": result = drawingExport.Export(args); break;
                     case "validate": result = validate.Validate(args); break;
                     case "clash": result = validate.Clash(args); break;
                     default:
@@ -103,5 +108,7 @@ namespace TeklaMcp.Tekla
         }
     }
 }
+
+
 
 

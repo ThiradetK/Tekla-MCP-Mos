@@ -215,6 +215,8 @@ Flow 2 ขั้น:
 | D10 | Numbering | ไม่มี API สั่ง numbering → เพิ่ม `tekla_run_numbering` (WRITE, ผ่าน macro) |
 | D11 | Validation | `tekla_validate_model` ตรวจเฉพาะ numbering / assembly; ตัด `tekla_check_geometry` ออก |
 | D12 | โมเดลทดสอบ Phase 4–6 | ใช้ SSMC_Tekla ตามเดิม (drawing/numbering ที่ทดสอบสร้างจะอยู่ในโมเดล ถ้าไม่ลบ) |
+| D13 | PDF ของ drawing | `PrintDrawing` ผ่าน API ไม่เขียนไฟล์ (Educational) → ผู้ใช้เลือกใช้ macro ผ่าน UI: Document manager → Print (WPF macro) |
+| D14 | IFC2x3 | ใช้ `CreateIFC2x3Export` (API IFC4 ที่ระบุเวอร์ชัน 2x3 ยังได้ IFC4) |
 
 ## 9. ความเสี่ยง
 

@@ -299,7 +299,7 @@ namespace TeklaMcp.Tekla
 
             // No Open API runs numbering (D10): run Tekla's own commands through a temporary macro.
             // Commands taken from Tekla's shipped macros: CleanUpNumberingBeforeCreatingDrawings.cs ("") and Diagnose and Repair Model.cs ("full").
-            string file = "TeklaMcp_Numbering_" + System.Guid.NewGuid().ToString("N") + ".cs";
+            string file = "TeklaMcp_Numbering.cs";   // fixed name: Tekla caches compiled macros by file name
             string path = Path.Combine(macroDir, file);
             string body = scope == "full"
                 ? "akit.Callback(\"acmd_partnumbers_all\", \"full\", \"main_frame\"); akit.PushButton(\"warning_ok\", \"full_numbering_ok\");"
@@ -350,7 +350,7 @@ namespace TeklaMcp.Tekla
             catch (IOException) { return false; }
         }
 
-        private static string WritableMacroDir()
+        internal static string WritableMacroDir()
         {
             string dirs = "";
             global::Tekla.Structures.TeklaStructuresSettings.GetAdvancedOption("XS_MACRO_DIRECTORY", ref dirs);
@@ -471,4 +471,6 @@ namespace TeklaMcp.Tekla
         };
     }
 }
+
+
 

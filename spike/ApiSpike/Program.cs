@@ -25,6 +25,54 @@ internal static class Program
         AppDomain.CurrentDomain.AssemblyResolve += Resolve;
         if (args.Length >= 2 && args[0] == "options") return Options(args);
         if (args.Length >= 2 && args[0] == "profile") return ProfileProbe(args);
+        if (args.Length == 1 && args[0] == "probe14")
+        {
+            var realOut = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(Console.Error);
+            try { return Probe14.Run(realOut); } catch (Exception ex) { realOut.WriteLine("Error: " + ex); return 1; }
+        }
+        if (args.Length == 3 && args[0] == "probe13")
+        {
+            var realOut = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(Console.Error);
+            try { return Probe13.Run(realOut, args[1], args[2]); } catch (Exception ex) { realOut.WriteLine("Error: " + ex); return 1; }
+        }
+        if (args.Length == 2 && args[0] == "probe12")
+        {
+            var realOut = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(Console.Error);
+            try { return Probe12.Run(realOut, File.ReadAllText(args[1])); } catch (Exception ex) { realOut.WriteLine("Error: " + ex); return 1; }
+        }
+        if (args.Length == 3 && args[0] == "probe11")
+        {
+            var realOut = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(Console.Error);
+            try { return Probe11.Run(realOut, args[1], args[2]); } catch (Exception ex) { realOut.WriteLine("Error: " + ex); return 1; }
+        }
+        if (args.Length == 3 && args[0] == "probe10")
+        {
+            var realOut = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(Console.Error);
+            try { return Probe10.Run(realOut, args[1], args[2]); } catch (Exception ex) { realOut.WriteLine("Error: " + ex); return 1; }
+        }
+        if (args.Length == 4 && args[0] == "probe9")
+        {
+            var realOut = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(Console.Error);
+            try { return Probe9.Run(realOut, args[1], args[2], args[3]); } catch (Exception ex) { realOut.WriteLine("Error: " + ex); return 1; }
+        }
+        if (args.Length == 3 && args[0] == "probe8")
+        {
+            var realOut = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(Console.Error);
+            try { return Probe8.Run(realOut, args[1], args[2]); } catch (Exception ex) { realOut.WriteLine("Error: " + ex); return 1; }
+        }
+        if (args.Length == 2 && args[0] == "probe7")
+        {
+            var realOut = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(Console.Error);
+            try { return Probe7.Run(realOut, args[1]); } catch (Exception ex) { realOut.WriteLine("Error: " + ex); return 1; }
+        }
         if (args.Length == 1 && args[0] == "probe6")
         {
             var realOut = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };

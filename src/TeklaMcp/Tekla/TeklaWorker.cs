@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
@@ -35,21 +35,22 @@ namespace TeklaMcp.Tekla
         public TeklaWorker(string exePath, TimeSpan timeout) { _exe = exePath; _timeout = timeout; }
 
         /// <summary>Runs a worker operation. Throws TeklaException on failure.</summary>
-        /// <param name="retryOnReset">false for operations that must not run twice (future write tools).</param>
-        public JObject Call(string op, JObject args = null, bool retryOnReset = true)
+        /// <param name="retryOnReset">false for operations that must not run twice (write tools).</param>
+        /// <param name="timeout">Overrides the settings timeout for slow operations (drawing export through Tekla dialogs).</param>
+        public JObject Call(string op, JObject args = null, bool retryOnReset = true, TimeSpan? timeout = null)
         {
-            JObject r = Send(op, args);
+            JObject r = Send(op, args, timeout ?? _timeout);
             if ((bool?)r["reset"] == true)
             {
                 Log.Info("Tekla not reachable from current worker (" + (r["code"] ?? "not connected") + "); starting a fresh worker.");
                 Restart();
-                if (retryOnReset) r = Send(op, args);
+                if (retryOnReset) r = Send(op, args, timeout ?? _timeout);
             }
             if ((bool?)r["ok"] != true) throw new TeklaException((string)r["code"] ?? "tekla_error", (string)r["message"] ?? "Tekla worker error");
             return (JObject)r["result"];
         }
 
-        private JObject Send(string op, JObject args)
+        private JObject Send(string op, JObject args, TimeSpan timeout)
         {
             long id = Interlocked.Increment(ref _nextId);
             var tcs = new TaskCompletionSource<JObject>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -68,10 +69,10 @@ namespace TeklaMcp.Tekla
                     _child.Input.WriteLine(line); _child.Input.Flush();
                 }
             }
-            if (!((IAsyncResult)tcs.Task).AsyncWaitHandle.WaitOne(_timeout))
+            if (!((IAsyncResult)tcs.Task).AsyncWaitHandle.WaitOne(timeout))
             {
                 lock (_sync) _child?.Pending.TryRemove(id, out _);
-                throw new TeklaException("tekla_timeout", "Tekla did not respond within " + (int)_timeout.TotalSeconds + " s. Tekla may be busy or showing a dialog.");
+                throw new TeklaException("tekla_timeout", "Tekla did not respond within " + (int)timeout.TotalSeconds + " s. Tekla may be busy or showing a dialog.");
             }
             return tcs.Task.Result;
         }
@@ -144,3 +145,4 @@ namespace TeklaMcp.Tekla
         }
     }
 }
+

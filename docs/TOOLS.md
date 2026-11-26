@@ -1,6 +1,6 @@
 # Tools
 
-Generated from the server's `tools/list` (TeklaMcp 0.1.0, 41 tools). Units: mm, kg, degrees; coordinates are global.
+Generated from the server's `tools/list` (TeklaMcp 0.1.0, 44 tools). Units: mm, kg, degrees; coordinates are global.
 
 Every WRITE / DESTRUCTIVE tool also takes `mode` (`"preview"` | `"apply"`, required) and `confirm_token` (required for apply). See [SAFETY.md](SAFETY.md).
 
@@ -70,6 +70,14 @@ Every WRITE / DESTRUCTIVE tool also takes `mode` (`"preview"` | `"apply"`, requi
 | `tekla_issue_drawings` | WRITE | Issue (issue=true, default) or unissue (issue=false) drawings. | `drawing_ids`*, `issue` |
 | `tekla_delete_drawings` | DESTRUCTIVE | Delete drawings (max 200). An open drawing cannot be deleted. | `drawing_ids`* |
 | `tekla_run_numbering` | WRITE | Run Tekla numbering with the model's numbering settings. scope=modified (default) numbers new and changed objects; scope=full renumbers everything (existing marks may change). Needed before assembly, single-part and cast-unit drawings. The Open API has no numbering call, so this runs Tekla's numbering command through a temporary macro file in the XS_MACRO_DIRECTORY modeling folder (deleted afterwards). | `scope` |
+
+## Export
+
+| Tool | Level | What it does | Parameters (* = required) |
+|---|---|---|---|
+| `tekla_export_ifc` | READ | Export the model (or the objects selected in Tekla) to IFC 2x3, IFC4 or IFC4.3 with Tekla's IFC export: global or work-plane coordinates, layers by name, colors by class, optional bolts/welds/rebars/grids/assemblies. Tekla also writes a .htm summary and a .partReport next to the .ifc. Output goes to a new folder in the export folder (settings.json exportDir, default Documents\TeklaMcp\exports); an existing folder is never overwritten. The model is not changed. | `file_name`*, `version`, `view`, `selection`, `base_point`, `bolts`, `welds`, `rebars`, `grids`, `assemblies` |
+| `tekla_export_nc` | READ | Create NC files (DSTV) for steel parts of the model or of the objects selected in Tekla, with an NC settings file of the environment (SE_Asia: "DSTV for Profile", "DSTV for Plate", "DSTV for Angle"; an unknown name returns the list). Numbering must be up to date. Output goes to a new folder in the export folder (settings.json exportDir, default Documents\TeklaMcp\exports); an existing folder is never overwritten. The model is not changed. | `folder_name`*, `settings`*, `selection` |
+| `tekla_export_drawings` | READ | Export drawings to PDF, DWG or DXF (1-5 per call, by drawing_id from tekla_list_drawings). The Open API cannot do this in Tekla 2026, so the server drives Tekla's own Document manager > Print / Export with a temporary macro (a few seconds per drawing; Tekla's Document manager and dialogs open briefly, and they remember the folder and options used). File names follow Tekla's naming (contain the drawing mark); the Educational license adds a watermark to PDFs. No drawing may be open in the editor. Output goes to a new folder in the export folder (settings.json exportDir, default Documents\TeklaMcp\exports); an existing folder is never overwritten. The model is not changed. | `folder_name`*, `drawing_ids`*, `format` |
 
 ## Modify
 

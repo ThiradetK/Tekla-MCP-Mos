@@ -33,6 +33,28 @@ namespace TeklaMcp.Core
             return full;
         }
 
+        /// <summary>
+        /// Resolves a NEW folder "name" inside exportDir for exports that write several files. Same name rules as ResolvePath;
+        /// an existing folder is rejected (never overwritten).
+        /// </summary>
+        public static string ResolveFolder(string exportDir, string name)
+        {
+            ValidateName(name);
+            string root = Path.GetFullPath(exportDir);
+            string full = Path.GetFullPath(Path.Combine(root, name));
+            if (!full.StartsWith(root.TrimEnd('\\') + "\\", StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("name resolves outside the export folder.");
+            if (Directory.Exists(full) || File.Exists(full)) throw new ArgumentException("Folder already exists (not overwritten): " + full);
+            return full;
+        }
+
+        public static void ValidateName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("name is empty.");
+            if (name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || name.Contains("..") || name != Path.GetFileName(name))
+                throw new ArgumentException("name must be a plain name without folders: " + name);
+        }
+
         public static void Write(string path, string format, IList<string> columns, IList<JObject> rows, JObject meta)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path));
