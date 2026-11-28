@@ -32,8 +32,7 @@ namespace TeklaMcp.Tools.Export
 
         public ToolResult Execute(JObject args)
         {
-            string name = ((string)args[_nameArg] ?? "").Trim();
-            if (name.EndsWith(".ifc", StringComparison.OrdinalIgnoreCase)) name = name.Substring(0, name.Length - 4);
+            string name = TableExport.TrimExtension((string)args[_nameArg], ".ifc");   // the worker uses the same rule for the .ifc file name
             string folder;
             // ResolveFolder validates the user's name as given (no folders, no ".."); the prefix is added afterwards.
             try { TableExport.ValidateName(name); folder = TableExport.ResolveFolder(_settings.ExportDir, _prefix + name); }

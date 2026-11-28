@@ -42,6 +42,13 @@ namespace TeklaMcp.Tests
         public void MatchesPlotName_ExactPlotFileName(string file, string plot, bool expected) =>
             Assert.Equal(expected, TeklaMcp.Tekla.TeklaDrawingExport.MatchesPlotName(file, plot));
 
+        [Theory]
+        [InlineData("tower.v2", "tower.v2")]       // was cut to "tower" by GetFileNameWithoutExtension
+        [InlineData("rev1.2.ifc", "rev1.2")]
+        [InlineData("  tower.IFC ", "tower")]
+        [InlineData(null, "")]
+        public void TrimExtension_RemovesOnlyIfc(string input, string expected) => Assert.Equal(expected, TableExport.TrimExtension(input, ".ifc"));
+
         [Fact]
         public void Tools_AreReadLevel()
         {
