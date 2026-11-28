@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using TeklaMcp.Core;
 using TSM = Tekla.Structures.Model;
 using Op = Tekla.Structures.Model.Operations.Operation;
 
@@ -36,7 +37,8 @@ namespace TeklaMcp.Tekla
             if (!Versions.ContainsKey(version)) throw Invalid("version must be one of " + string.Join(", ", Versions.Keys) + ".");
             if (!Views.ContainsKey(view) && !(version == "ifc2x3" && view == "steel_fabrication")) throw Invalid("view must be one of " + string.Join(", ", Views.Keys) + " (ifc2x3 also: steel_fabrication).");
             if (basePoint != "global" && basePoint != "work_plane") throw Invalid("base_point must be global or work_plane.");
-            string name = Path.GetFileNameWithoutExtension((string)a["file_name"]);
+            // Same rule as the server's folder name: strip only ".ifc" (GetFileNameWithoutExtension turned "tower.v2" into "tower").
+            string name = TableExport.TrimExtension((string)a["file_name"], ".ifc");
             string file = Path.Combine(folder, name + ".ifc");
             var flags = new Op.IFCExportFlags
             {

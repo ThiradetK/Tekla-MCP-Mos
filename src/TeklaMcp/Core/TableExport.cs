@@ -48,6 +48,13 @@ namespace TeklaMcp.Core
             return full;
         }
 
+        /// <summary>Removes one trailing extension (e.g. ".ifc") and nothing else: "tower.v2" stays "tower.v2".</summary>
+        public static string TrimExtension(string name, string extension)
+        {
+            name = (name ?? "").Trim();
+            return name.EndsWith(extension, StringComparison.OrdinalIgnoreCase) ? name.Substring(0, name.Length - extension.Length) : name;
+        }
+
         public static void ValidateName(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("name is empty.");

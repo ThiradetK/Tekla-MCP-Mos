@@ -60,7 +60,7 @@ namespace TeklaMcp.Tests
 
         [Theory]
         [InlineData("{{step2.guid}}", "earlier step")]       // forward reference
-        [InlineData("{{step1.guid}}", "creates no objects")] // step 1 is a modify
+        [InlineData("{{step1.guid}}", "creates no new objects")] // step 1 is a modify
         [InlineData("{{stepX}}", "Bad reference")]
         public void Preview_RejectsBadReferences(string reference, string message)
         {
@@ -129,6 +129,46 @@ namespace TeklaMcp.Tests
             var ap = h.Call("tekla_batch_execute", args, 3);
             Assert.False((bool)ap["result"]["isError"]);
             Assert.Contains(h.AuditEntries(), e => (string)e["tool"] == "tekla_batch_execute" && (string)e["outcome"] == "applied");
+        }
+
+        [Fact]
+        public void References_OnlyToStepsThatCreateNewObjects()
+        {
+            var asm = new StepTool("tekla_create_assembly");
+            var del = new StepTool("tekla_delete_objects");
+            var beam = new StepTool("tekla_create_beam");
+            var b = new BatchTool(new IWriteTool[] { asm, del, beam });
+            // tekla_create_assembly returns the EXISTING assembly and parts as "affected": no references to it.
+            var r = b.Preview(Steps(("tekla_create_assembly", new JObject()), ("tekla_delete_objects", new JObject { ["guid"] = "{{step1.guid}}" })));
+            Assert.True(r.IsError);
+            Assert.Contains("creates no new objects", (string)r.Data["error"]["message"]);
+        }
+
+        [Fact]
+        public void DeferredStep_MayNotMixReferencesWithExistingObjects()
+        {
+            var del = new GuidsTool("tekla_delete_objects");
+            var b = new BatchTool(new IWriteTool[] { new StepTool("tekla_create_beam"), del });
+            var mixed = b.Preview(Steps(("tekla_create_beam", new JObject()), ("tekla_delete_objects", new JObject { ["guids"] = new JArray("{{step1.guid}}", "existing-guid") })));
+            Assert.True(mixed.IsError);
+            Assert.Contains("mixes references with existing objects", (string)mixed.Data["error"]["message"]);
+            var onlyRefs = b.Preview(Steps(("tekla_create_beam", new JObject()), ("tekla_delete_objects", new JObject { ["guids"] = new JArray("{{step1.guid}}", "{{step1.guids[1]}}") })));
+            Assert.False(onlyRefs.IsError);
+            var listed = ((JArray)onlyRefs.Data["objects"]).Where(o => (string)o["tool"] == "tekla_delete_objects").ToList();
+            Assert.Equal(2, listed.Count);                                  // each deleted object is listed with the step that creates it
+            Assert.All(listed, o => Assert.Equal(1, (int)o["created_by_step"]));
+        }
+
+        private sealed class GuidsTool : IWriteTool
+        {
+            public GuidsTool(string name) { Name = name; }
+            public string Name { get; }
+            public string Title => Name;
+            public string Description => Name;
+            public ToolLevel Level => ToolLevel.Write;
+            public JObject InputSchema => SchemaBuilder.ForWrite(new JObject { ["guids"] = SchemaBuilder.Array(SchemaBuilder.String("guid"), "guids") });
+            public ToolResult Preview(JObject a) => ToolResult.Ok("preview", new JObject { ["objects"] = new JArray(new JObject { ["guid"] = "x" }) });
+            public ToolResult Apply(JObject a) => ToolResult.Ok("applied", new JObject { ["affected"] = a["guids"].DeepClone() });
         }
 
         [Fact]

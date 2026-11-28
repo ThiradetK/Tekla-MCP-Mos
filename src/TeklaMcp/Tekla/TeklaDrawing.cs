@@ -166,14 +166,17 @@ namespace TeklaMcp.Tekla
             if (!apply) return preview;
             var mism = new JArray();
             var ids = list.Select(Id).ToList();
+            var failed = new HashSet<string>();
             foreach (var d in list)
             {
-                try { if (!dh.UpdateDrawing(d)) mism.Add(Id(d) + ": UpdateDrawing returned false"); }
-                catch (TSD.CannotPerformOperationNumberingNotUpToDate) { mism.Add(Id(d) + ": numbering is not up to date (run tekla_run_numbering)"); }
+                try { if (!dh.UpdateDrawing(d)) { failed.Add(Id(d)); mism.Add(Id(d) + ": UpdateDrawing returned false"); } }
+                catch (TSD.CannotPerformOperationNumberingNotUpToDate) { failed.Add(Id(d)); mism.Add(Id(d) + ": numbering is not up to date (run tekla_run_numbering)"); }
             }
             var after = ReadBack(dh, ids, mism);
             foreach (var r in after.Where(r => !(bool)r["up_to_date"])) mism.Add(r["drawing_id"] + " is still " + r["up_to_date_status"]);
-            return Applied("Updated " + (list.Count - mism.Count) + " of " + list.Count + " drawing(s).", ids, new JArray(after), mism);
+            // One drawing can add several mismatch lines, so count drawings, not lines (code review 2026-11-28).
+            int updated = after.Count(r => (bool)r["up_to_date"] && !failed.Contains((string)r["drawing_id"]));
+            return Applied("Updated " + updated + " of " + list.Count + " drawing(s).", ids, new JArray(after), mism);
         }
 
         private JObject Issue(JObject p, bool apply)

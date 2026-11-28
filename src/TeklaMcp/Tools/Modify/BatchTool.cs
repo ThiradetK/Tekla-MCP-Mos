@@ -18,6 +18,18 @@ namespace TeklaMcp.Tools.Modify
     internal sealed class BatchTool : IWriteTool
     {
         public const int MaxSteps = 100;
+
+        // Steps whose "affected" GUIDs are NEW objects. Not tekla_create_assembly / tekla_add_to_assembly: their affected list is the
+        // existing assembly and parts, so a reference would reach objects the preview never showed (code review 2026-11-28).
+        internal static readonly HashSet<string> CreatingTools = new HashSet<string>
+        {
+            "tekla_create_beam", "tekla_create_column", "tekla_create_plate", "tekla_create_bolts", "tekla_create_weld",
+            "tekla_create_rebar", "tekla_create_grid", "tekla_copy_objects"
+        };
+
+        // Steps that act on the objects listed in "guids".
+        private static readonly HashSet<string> ActOnGuids = new HashSet<string>
+        { "tekla_modify_objects", "tekla_move_objects", "tekla_copy_objects", "tekla_delete_objects" };
         private static readonly Regex Ref = new Regex(@"^\{\{step(\d+)\.(guid|guids\[(\d+)\])\}\}$", RegexOptions.Compiled);
         private readonly Dictionary<string, IWriteTool> _tools;
 
@@ -72,7 +84,15 @@ namespace TeklaMcp.Tools.Modify
                     row["references"] = new JArray(refs.Select(r => r.text));
                     row["args"] = stepArgs.DeepClone();
                     row["summary"] = "Deferred: uses objects created by step(s) " + string.Join(", ", refs.Select(r => r.step).Distinct()) + "; checked when applied.";
-                    objects.Add(new JObject { ["step"] = i + 1, ["tool"] = toolName, ["summary"] = (string)row["summary"] });
+                    if (toolName == "tekla_delete_objects")
+                        // Every target is an object this batch creates (enforced in Steps): list each one with the step that creates it.
+                        foreach (var r in refs)
+                            objects.Add(new JObject
+                            {
+                                ["step"] = i + 1, ["tool"] = toolName, ["delete"] = r.text, ["created_by_step"] = r.step,
+                                ["created_by"] = rows[r.step - 1]["summary"]?.DeepClone()
+                            });
+                    else objects.Add(new JObject { ["step"] = i + 1, ["tool"] = toolName, ["summary"] = (string)row["summary"] });
                 }
                 else
                 {
@@ -173,8 +193,16 @@ namespace TeklaMcp.Tools.Modify
                         return list;
                     }
                     string src = (string)((JObject)arr[r.step - 1])["tool"];
-                    if (!src.StartsWith("tekla_create_") && src != "tekla_copy_objects")
-                    { error = ToolResult.Fail("invalid_arguments", "step " + (i + 1) + ": " + r.text + " refers to step " + r.step + " (" + src + "), which creates no objects."); return list; }
+                    if (!CreatingTools.Contains(src))
+                    { error = ToolResult.Fail("invalid_arguments", "step " + (i + 1) + ": " + r.text + " refers to step " + r.step + " (" + src + "), which creates no new objects."); return list; }
+                }
+                // A deferred step gets no preview of its own, so it must not also act on existing objects.
+                if (refs.Count > 0 && ActOnGuids.Contains(name) && stepArgs["guids"] is JArray targets &&
+                    targets.Any(g => !(g.Type == JTokenType.String && Ref.IsMatch((string)g))))
+                {
+                    error = ToolResult.Fail("invalid_arguments", "step " + (i + 1) + " (" + name + "): guids mixes references with existing objects. " +
+                                            "Put the existing objects in a separate step so they get a full preview.");
+                    return list;
                 }
                 list.Add((name, stepArgs));
             }
